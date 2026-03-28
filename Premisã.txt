@@ -1,0 +1,78 @@
+O Cenário: O Projeto "Sentinela de Órbita"
+A História:
+Você foi contratado pela AeroSpace Insights, uma startup fictícia que monitora a saúde de constelações de satélites de baixo custo (CubeSats). Esses satélites enviam telemetria constante, mas o sistema atual é caótico: os dados chegam via APIs de diferentes estações terrestres e são despejados em arquivos brutos.
+
+A empresa precisa que você crie um pipeline que capture esses dados de telemetria, organize-os por "Missão" e os carregue em um Data Warehouse (Postgres) para que os analistas possam prever falhas de bateria e desvios de órbita.
+
+O Desafio Técnico
+O foco é a ingestão de dados semi-estruturados (JSON) e estruturados (CSV) simulando um ambiente de produção real.
+
+O Que Você Deve Implementar
+1. A Origem dos Dados (Simulação)
+Em vez de baixar um dataset pronto, você vai criar um Script Gerador (em Python) que simula a API da estação espacial.
+
+Ele deve gerar arquivos JSON (telemetria de bateria: voltagem, temperatura) e CSV (dados de posicionamento: latitude, longitude, altitude).
+
+Os arquivos devem ser salvos em uma pasta local que o seu container Docker do Airflow consiga "enxergar" (volumes).
+
+2. Orquestração com Astro (Airflow)
+Sua DAG deve ser o coração do projeto. Ela deve:
+
+Sensor de Arquivo: Ficar monitorando a pasta de entrada. Assim que o gerador criar os arquivos, a DAG "acorda".
+
+Validação de Schema: Antes de carregar, a DAG deve conferir se o JSON não está corrompido e se o CSV tem todas as colunas necessárias.
+
+Arquivamento (Bronze Layer): Após a leitura, mova os arquivos originais para uma pasta processed/data=YYYY-MM-DD/. Isso simula um Data Lake.
+
+3. Carga no Postgres (O "L" do EL)
+No seu banco de dados, você deve estruturar três tabelas:
+
+stg_telemetry_battery (para os dados do JSON).
+
+stg_satellite_position (para os dados do CSV).
+
+dim_satellites (uma tabela fixa que você criará manualmente com os nomes e IDs dos satélites).
+
+4. Containerização
+Tudo deve rodar via Docker Compose. O Airflow (via Astro CLI) e o banco Postgres devem estar na mesma rede, comunicando-se perfeitamente.
+
+Por que este projeto é "diferente"?
+Sincronização de Formatos: Você lida com JSON e CSV simultaneamente, algo comum no dia a dia.
+
+Idempotência: Você terá que configurar sua DAG para que, se ela rodar duas vezes para o mesmo arquivo, ela não duplique os dados no Postgres (usando comandos de UPSERT ou limpando a staging).
+
+Monitoramento de "Land": Você não está apenas dando um "play". O uso de Sensores (FileSensor) no Airflow demonstra conhecimento avançado de eventos.
+
+O que postar no GitHub?
+Para que um recrutador brilhe os olhos, seu repositório deve ter:
+
+O Diagrama da Arquitetura: Desenhe como o dado flui do Script Gerador -> Pasta -> Airflow -> Postgres.
+
+README Profissional: Explicando o cenário da AeroSpace Insights.
+
+Instruções de Docker: Um simples astro dev start deve ser capaz de subir o seu ambiente.
+
+Evidências: Prints do log do Airflow e uma query simples no Postgres mostrando os dados carregados.
+
+Dica de Ouro: Como você quer focar em EL, tente fazer a carga usando o conceito de COPY do Postgres (mais rápido para grandes volumes) em vez de simples INSERT linha a linha.
+
+---------------------------------------------------------------------------------
+
+Sua Missão de Engenharia (O "Setup" do Vencedor)
+Com 100 linhas em cada arquivo, você agora tem dados suficientes para simular uma ingestão de produção. Veja o que fazer:
+
+Criação das Tabelas de Staging: No Postgres, use apenas VARCHAR ou TEXT.
+
+Dica: Se você definir alt_km como NUMERIC agora, o valor "406,1" (com vírgula) ou NULL escrito como string vai fazer sua DAG falhar. Ingestão é sobre extrair e carregar, não limpar.
+
+A DAG no Airflow:
+
+Configure a DAG para rodar em intervalos (ex: @daily ou @hourly).
+
+Use o FileSensor para detectar quando você colocar esses arquivos na pasta include/.
+
+Use o PostgresOperator para executar um comando COPY (mais performático) ou o PythonOperator com o PostgresHook para iterar sobre os dados.
+
+Diferencial no GitHub:
+
+No seu README, explique que você escolheu carregar os dados como TEXT para garantir a observabilidade. Diga: "Eu carrego o dado bruto para não perder informação; a limpeza acontece em uma camada secundária para que possamos auditar por que o satélite enviou 'NaN' na bateria".
