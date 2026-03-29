@@ -1,13 +1,20 @@
 O Cenário: O Projeto "Sentinela de Órbita"
+
+
 A História:
+
 Você foi contratado pela AeroSpace Insights, uma startup fictícia que monitora a saúde de constelações de satélites de baixo custo (CubeSats). Esses satélites enviam telemetria constante, mas o sistema atual é caótico: os dados chegam via APIs de diferentes estações terrestres e são despejados em arquivos brutos.
 
 A empresa precisa que você crie um pipeline que capture esses dados de telemetria, organize-os por "Missão" e os carregue em um Data Warehouse (Postgres) para que os analistas possam prever falhas de bateria e desvios de órbita.
 
+
 O Desafio Técnico
+
 O foco é a ingestão de dados semi-estruturados (JSON) e estruturados (CSV) simulando um ambiente de produção real.
 
+
 O Que Você Deve Implementar
+
 1. A Origem dos Dados (Simulação)
 Em vez de baixar um dataset pronto, você vai criar um Script Gerador (em Python) que simula a API da estação espacial.
 
@@ -15,7 +22,9 @@ Ele deve gerar arquivos JSON (telemetria de bateria: voltagem, temperatura) e CS
 
 Os arquivos devem ser salvos em uma pasta local que o seu container Docker do Airflow consiga "enxergar" (volumes).
 
+
 2. Orquestração com Astro (Airflow)
+
 Sua DAG deve ser o coração do projeto. Ela deve:
 
 Sensor de Arquivo: Ficar monitorando a pasta de entrada. Assim que o gerador criar os arquivos, a DAG "acorda".
@@ -24,7 +33,9 @@ Validação de Schema: Antes de carregar, a DAG deve conferir se o JSON não est
 
 Arquivamento (Bronze Layer): Após a leitura, mova os arquivos originais para uma pasta processed/data=YYYY-MM-DD/. Isso simula um Data Lake.
 
+
 3. Carga no Postgres (O "L" do EL)
+
 No seu banco de dados, você deve estruturar três tabelas:
 
 stg_telemetry_battery (para os dados do JSON).
@@ -33,7 +44,9 @@ stg_satellite_position (para os dados do CSV).
 
 dim_satellites (uma tabela fixa que você criará manualmente com os nomes e IDs dos satélites).
 
+
 4. Containerização
+
 Tudo deve rodar via Docker Compose. O Airflow (via Astro CLI) e o banco Postgres devem estar na mesma rede, comunicando-se perfeitamente.
 
 Por que este projeto é "diferente"?

@@ -1,0 +1,17 @@
+services:
+  postgres_dwh:
+    image: postgres:15
+    container_name: sentinela_dwh
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: adminpassword
+      POSTGRES_DB: aerospace_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./include/sql:/docker-entrypoint-initdb.d
+      - postgres_dwh_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_dwh_data:
