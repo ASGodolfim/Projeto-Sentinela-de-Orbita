@@ -7,6 +7,6 @@ sentinela_profile:
       host: host.docker.internal
       port: 5433
       user: admin
-      pass: adminpassword
+      password: adminpassword
       dbname: aerospace_db
       schema: analytics

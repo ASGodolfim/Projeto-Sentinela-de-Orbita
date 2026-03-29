@@ -1,7 +1,7 @@
 WITH telemetry AS (
     SELECT * FROM {{ ref('stg_telemetry_clean') }}
 ),
-position AS (
+pos_data AS (
     SELECT * FROM {{ ref('stg_position_clean') }}
 ),
 dim_satellites AS (
@@ -21,6 +21,6 @@ SELECT
 FROM telemetry t
 INNER JOIN dim_satellites s 
     ON t.satellite_id = s.satellite_name
-LEFT JOIN position p 
+LEFT JOIN pos_data p 
     ON t.satellite_id = p.satellite_id
     AND EXTRACT(EPOCH FROM t.record_timestamp) = EXTRACT(EPOCH FROM p.record_timestamp)

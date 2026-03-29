@@ -4,8 +4,8 @@ WITH source AS (
 
 SELECT
     satellite_id,
-    CAST(latitude AS DECIMAL(10,6)) AS latitude,
-    CAST(longitude AS DECIMAL(10,6)) AS longitude,
-    CAST(REPLACE(altitude_km, ',', '.') AS DECIMAL(10,2)) AS altitude_km,
-    CAST(timestamp AS TIMESTAMP) AS record_timestamp
+    CAST(NULLIF(TRIM(latitude), '') AS DECIMAL(10,6)) AS latitude,
+    CAST(NULLIF(TRIM(longitude), '') AS DECIMAL(10,6)) AS longitude,
+    CAST(REPLACE(NULLIF(TRIM(altitude_km), ''), ',', '.') AS DECIMAL(10,2)) AS altitude_km,
+    CAST(NULLIF(TRIM(timestamp), '') AS TIMESTAMP) AS record_timestamp
 FROM source

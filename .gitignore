@@ -211,3 +211,11 @@ include/inbound/*
 include/processed/*
 airflow_settings.yaml
 fix_csvs.py
+
+# Arquivos de Compilação DBT e Debug Logs Fixos
+include/dbt/sentinela/target/
+include/dbt/sentinela/dbt_packages/
+include/dbt_log.txt
+test_dbt.py
+log.txt
+dbt_scheduler_logs.txt
