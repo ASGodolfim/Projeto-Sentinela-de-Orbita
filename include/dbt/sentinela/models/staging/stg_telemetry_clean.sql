@@ -4,7 +4,6 @@ WITH source AS (
 
 SELECT
     satellite_id,
-    -- Limpeza de Sujeira Oculta. Ignora textos absurdos 'NaN' e acopla a base em Vazio (NULL lógicos)
     CASE 
         WHEN voltage = 'NaN' THEN NULL 
         ELSE CAST(voltage AS DECIMAL(5,2)) 

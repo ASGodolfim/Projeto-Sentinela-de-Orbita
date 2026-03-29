@@ -22,6 +22,5 @@ FROM telemetry t
 INNER JOIN dim_satellites s 
     ON t.satellite_id = s.satellite_name
 LEFT JOIN position p 
-    ON t.satellite_id = p.satellite_id 
-    -- Sincronizamos os dois pings de sensores usando o mesmo relógio analítico para cruzar os eixos
+    ON t.satellite_id = p.satellite_id
     AND EXTRACT(EPOCH FROM t.record_timestamp) = EXTRACT(EPOCH FROM p.record_timestamp)
