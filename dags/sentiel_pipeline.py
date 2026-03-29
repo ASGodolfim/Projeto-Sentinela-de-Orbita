@@ -1,6 +1,7 @@
 from airflow import DAG
 from airflow.sensors.python import PythonSensor
 from airflow.operators.python import PythonOperator
+from airflow.operators.bash import BashOperator
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 from datetime import datetime, timedelta
@@ -178,4 +179,9 @@ with DAG(
         python_callable=archive_files,
     )
 
-    [wait_for_telemetry, wait_for_position] >> validate_data_task >> init_database_task >> [csv_filter_task, json_filter_task] >> archive_task
+    dbt_run_task = BashOperator(
+        task_id="dbt_transformation",
+        bash_command="dbt run --project-dir /usr/local/airflow/include/dbt/sentinela --profiles-dir /usr/local/airflow/include/dbt/sentinela",
+    )
+
+    [wait_for_telemetry, wait_for_position] >> validate_data_task >> init_database_task >> [csv_filter_task, json_filter_task] >> archive_task >> dbt_run_task

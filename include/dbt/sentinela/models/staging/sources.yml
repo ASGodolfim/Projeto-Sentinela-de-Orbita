@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: aerospace_raw
+    schema: public
+    tables:
+      - name: stg_telemetry_battery
+      - name: stg_satellite_position
+      - name: dim_satellites

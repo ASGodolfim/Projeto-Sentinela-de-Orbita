@@ -1,0 +1,12 @@
+sentinela_profile:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      threads: 4
+      host: host.docker.internal
+      port: 5433
+      user: admin
+      pass: adminpassword
+      dbname: aerospace_db
+      schema: analytics
